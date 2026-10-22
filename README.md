@@ -127,7 +127,7 @@ uv run python tests/local_browser_smoke.py
 uv run python tests/live_windows_acceptance.py --inventory-change
 ```
 
-All pytest account/event data is labeled synthetic test data; live Windows acceptance tests execute actual read-only Windows event queries and temporary, reversible registry inventory changes in an isolated test database. Actual verification runs are tracked in [PROGRESS.md](PROGRESS.md).
+All pytest account/event data is labeled synthetic test data; live Windows acceptance tests execute actual read-only Windows event queries and temporary, reversible registry inventory changes in an isolated test database.
 
 ## Architecture & Security Docs
 

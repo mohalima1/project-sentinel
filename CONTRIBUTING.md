@@ -1,6 +1,6 @@
 # Contributing
 
-Read AGENTS.md, PROJECT_SPEC.md, and PROGRESS.md. Use the locked environment and
+Read README.md and the documentation in docs/. Use the locked environment and
 setup commands in README.md. Run pytest, Ruff, the frontend build, and browser smoke
 checks before proposing a change. Document actual results and unverified behavior.
 Use synthetic fixtures in tests and label them accordingly. Never commit real

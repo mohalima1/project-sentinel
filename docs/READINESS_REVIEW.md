@@ -6,7 +6,7 @@ scrypt parameters and upgrades old hashes on successful login. Local launcher
 access no longer requires registration/password entry. The findings below record
 the original assessment; R1 and the collector/installer gates still apply.
 
-Reviewed 2026-10-22 against AGENTS.md and PROJECT_SPEC.md. Scope: current backend,
+Reviewed 2026-10-22 against the personal SIEM specification. Scope: current backend,
 database/migration, frontend, setup, tests, and intended single-host Windows SIEM.
 Security paths were inspected statically. Separate functional readiness checks
 used temporary SQLite databases and synthetic accounts. This is not a penetration
