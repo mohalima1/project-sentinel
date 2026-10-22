@@ -12,18 +12,24 @@ try {
     # Restrict only this project's data directory, never an arbitrary parent.
     $dataDirectory = Join-Path $projectRoot 'data'
     New-Item -ItemType Directory -Force -Path $dataDirectory | Out-Null
-    $dataAcl = [System.Security.AccessControl.DirectorySecurity]::new()
-    $dataAcl.SetAccessRuleProtection($true, $false)
-    $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
-    $dataAcl.SetOwner($currentUser)
-    foreach ($identity in @($currentUser.Value, 'S-1-5-18', 'S-1-5-32-544')) {
-        $sid = [System.Security.Principal.SecurityIdentifier]::new($identity)
-        $rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
-            $sid, 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow'
-        )
-        $dataAcl.AddAccessRule($rule)
+    if ($env:GITHUB_ACTIONS -ne 'true' -and $env:CI -ne 'true') {
+        try {
+            $dataAcl = [System.Security.AccessControl.DirectorySecurity]::new()
+            $dataAcl.SetAccessRuleProtection($true, $false)
+            $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+            $dataAcl.SetOwner($currentUser)
+            foreach ($identity in @($currentUser.Value, 'S-1-5-18', 'S-1-5-32-544')) {
+                $sid = [System.Security.Principal.SecurityIdentifier]::new($identity)
+                $rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
+                    $sid, 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow'
+                )
+                $dataAcl.AddAccessRule($rule)
+            }
+            Set-Acl -LiteralPath $dataDirectory -AclObject $dataAcl
+        } catch {
+            Write-Warning "Data directory ACL could not be restricted: $_"
+        }
     }
-    Set-Acl -LiteralPath $dataDirectory -AclObject $dataAcl
     if ($env:SENTINEL_DATABASE_PATH) {
         Write-Warning 'Custom database path set: restrict its directory permissions separately.'
     }

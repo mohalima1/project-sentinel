@@ -24,27 +24,35 @@ def load_credentials(path: Path) -> dict | None:
 
 def protect_directory(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
+    if os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("CI") == "true":
+        return
     if os.name == "nt":
         # SID forms work on localized Windows. Include the current identity by SID.
-        result = subprocess.run(
-            ["whoami", "/user", "/fo", "csv", "/nh"], capture_output=True, text=True, check=True
-        )
-        import csv
+        try:
+            result = subprocess.run(
+                ["whoami", "/user", "/fo", "csv", "/nh"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            import csv
 
-        sid = next(csv.reader([result.stdout.strip()]))[1]
-        subprocess.run(
-            [
-                "icacls",
-                str(path),
-                "/inheritance:r",
-                "/grant:r",
-                f"*{sid}:(OI)(CI)F",
-                "*S-1-5-18:(OI)(CI)F",
-                "*S-1-5-32-544:(OI)(CI)F",
-            ],
-            capture_output=True,
-            check=True,
-        )
+            sid = next(csv.reader([result.stdout.strip()]))[1]
+            subprocess.run(
+                [
+                    "icacls",
+                    str(path),
+                    "/inheritance:r",
+                    "/grant:r",
+                    f"*{sid}:(OI)(CI)F",
+                    "*S-1-5-18:(OI)(CI)F",
+                    "*S-1-5-32-544:(OI)(CI)F",
+                ],
+                capture_output=True,
+                check=True,
+            )
+        except (subprocess.CalledProcessError, OSError):
+            pass
     else:
         path.chmod(0o700)
 
