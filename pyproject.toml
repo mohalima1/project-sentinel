@@ -1,0 +1,50 @@
+[project]
+name = "project-sentinel"
+version = "0.1.0"
+description = "Project Sentinel local dashboard"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "fastapi==0.159.1",
+    "uvicorn==0.54.0",
+    "sqlalchemy==2.0.55",
+    "alembic==1.20.1",
+]
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend/sentinel"]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.17.1",
+    "playwright==1.64.1",
+    "httpx2==2.16.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["backend"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# F811: pytest fixture re-exports are intentional redefinitions; ruff cannot detect
+#        that the module-level import is used for fixture discovery, not re-assignment.
+"tests/*.py" = ["F811"]
+# live_windows_acceptance.py contains long strings (URLs, registry paths, human-readable
+# print messages) that cannot be split without losing clarity.
+"tests/live_windows_acceptance.py" = ["E501"]
+# detections.py stores human-readable security rule descriptions (prerequisites,
+# investigation steps, why/legitimate text) as deliberately long prose strings.
+# Wrapping mid-sentence harms readability of the security guidance.
+"backend/sentinel/monitoring/detections.py" = ["E501"]
+
